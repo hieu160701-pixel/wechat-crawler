@@ -28,10 +28,28 @@ SYSTEM REQUIREMENTS
    - Download: https://www.python.org/downloads/
 
 2. WeChat PC installed and running
-   - Supports WeChat versions 3.9.x - 4.1.x
+   - IMPORTANT: Supports WeChat versions 3.9.x - 4.0.x (WeChat.exe)
+   - WeChat 4.1+ uses WeChatAppEx.exe and CANNOT auto-get key yet
+   - If you have WeChat 4.1+, see DOWNGRADE section below
 
 3. pywxdump 3.1+
    - Install: pip install pywxdump
+
+================================================================================
+DOWNGRADE WECHAT (Required for WeChat 4.1+ Users)
+================================================================================
+
+WeChat 4.1+ does NOT expose encryption key in memory, so this tool cannot
+auto-get the key. You must use WeChat 3.9.x - 4.0.x.
+
+How to downgrade:
+1. Uninstall current WeChat from Control Panel
+2. Download older version from: https://github.com/tom-snow/wechat-windows-versions
+3. Install version 3.9.5.33 or 4.0.0.x
+4. DO NOT auto-update WeChat after installation
+5. Disable WeChat auto-update in settings
+
+Note: Your chat history will NOT be deleted when downgrading.
 
 ================================================================================
 SETUP
