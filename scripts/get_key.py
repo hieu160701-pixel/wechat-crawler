@@ -57,19 +57,38 @@ def main():
         if wx_info:
             log(f"WeChat Info: {wx_info}")
 
-            key = wx_info.get("key", "")
-            wxid = wx_info.get("wxid", "")
-            version = wx_info.get("version", "")
+            # Handle list response (multiple WeChat instances)
+            key = None
+            wxid = None
+            version = None
+            wx_dir = None
+
+            if isinstance(wx_info, list):
+                for info in wx_info:
+                    if info.get("key"):
+                        key = info.get("key")
+                        wxid = info.get("wxid") or wxid
+                        version = info.get("version") or version
+                        wx_dir = info.get("wx_dir") or wx_dir
+                        break
+
+            if not key:
+                # Try dict response
+                key = wx_info.get("key") if isinstance(wx_info, dict) else None
 
             if key:
                 log(f"Key found: {key[:32]}...")
 
                 config = load_config()
                 config["key"] = key
-                config["wxid"] = wxid
-                config["version"] = version
+                if wxid:
+                    config["wxid"] = wxid
+                if version:
+                    config["version"] = version
 
-                if "wx_dir" not in config:
+                if "wx_dir" not in config and wx_dir:
+                    config["wx_dir"] = wx_dir
+                elif "wx_dir" not in config and wxid:
                     wx_dirs = [
                         os.path.join(os.environ.get("USERPROFILE", ""), "Documents", "WeChat Files", wxid),
                         r"C:\Users\Public\Documents\WeChat Files",
@@ -94,8 +113,22 @@ def main():
                 print(f"wxid: {wxid}")
                 print("=" * 50)
             else:
-                log("ERROR: No key in WeChat info")
-                print("ERROR: Could not get key from WeChat")
+                # No new key - check if we have existing key
+                config = load_config()
+                old_key = config.get("key", "").strip()
+                if old_key:
+                    log("No new key available (WeChat 4.1+ not fully supported)")
+                    log(f"Using existing key from config: {old_key[:32]}...")
+                    print()
+                    print("=" * 50)
+                    print("NOTE: Using existing key from config.json")
+                    print(f"Key: {old_key}")
+                    print("(Key may expire - restart WeChat and run again if decryption fails)")
+                    print("=" * 50)
+                else:
+                    log("ERROR: No key available")
+                    print("ERROR: Could not get key from WeChat")
+                    print("WeChat 4.1+ may not be fully supported by pywxdump")
         else:
             log("ERROR: Could not get WeChat info")
             print("ERROR: Could not connect to WeChat")
