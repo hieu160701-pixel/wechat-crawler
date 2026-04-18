@@ -1,7 +1,7 @@
 # ============================================================
-# WXCRAWL - Export Tin Nhắn
+# WXCRAWL - Export Tin Nh???n
 # ============================================================
-# Xuất tin nhắn theo cuộc trò chuyện với tên người gửi
+# Xu???t tin nh???n theo cu???c tr?? chuy???n v???i t??n ng?????i g???i
 # ============================================================
 
 import json
@@ -72,6 +72,9 @@ class ContactResolver:
             return info["remark"] if info["remark"] else info["nickname"] or wxid
         return wxid
 
+    def get_member_name(self, wxid):
+        return self.get_name(wxid)
+
     def is_chatroom(self, wxid):
         return wxid in self.chatrooms or wxid.endswith("@chatroom")
 
@@ -126,9 +129,12 @@ def format_msg(record, resolver, my_wxid):
     sender_name = None
     if resolver.is_chatroom(talker):
         sender_wxid = extract_sender(bytes_extra)
-        sender_name = resolver.get_member_name(sender_wxid) if sender_wxid else "Unknown"
+        if sender_wxid == my_wxid:
+            sender_name = "Me"
+        else:
+            sender_name = resolver.get_member_name(sender_wxid) if sender_wxid else "Unknown"
     else:
-        sender_name = "Tôi" if is_sender else resolver.get_name(talker)
+        sender_name = "Me" if is_sender else resolver.get_name(talker)
 
     return {
         "msg_id": record.get("localId", "") or "",
@@ -230,11 +236,11 @@ def main():
             "conversation_id": talker_id,
             "conversation_name": name,
             "is_chatroom": is_cr,
-            "type": "Nhóm" if is_cr else "Cá nhân",
+            "type": "Nh??m" if is_cr else "C?? nh??n",
             "total_messages": len(messages),
             "messages": messages
         }, filepath)
-        files.append({"filename": filename, "name": name, "type": "Nhóm" if is_cr else "Cá nhân", "messages": len(messages)})
+        files.append({"filename": filename, "name": name, "type": "Nh??m" if is_cr else "C?? nh??n", "messages": len(messages)})
         log(f"  Exported: {filename}")
 
     export_json({"export_time": ts, "total_conversations": len(grouped), "total_messages": len(formatted), "files": files},

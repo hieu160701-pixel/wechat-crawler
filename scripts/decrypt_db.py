@@ -63,20 +63,24 @@ def main():
 
     # Decrypt MicroMsg.db
     micromsg_src = os.path.join(wx_dir, "Msg", "MicroMsg.db")
+    micromsg_dst = os.path.join(DECRYPT_DIR, "de_MicroMsg.db")
     if os.path.exists(micromsg_src):
         log(f"Decrypting: MicroMsg.db")
         try:
-            decrypt_merge(key, micromsg_src, DECRYPT_DIR)
+            from pywxdump import decrypt
+            decrypt(key, micromsg_src, micromsg_dst)
             log(f"  Success: de_MicroMsg.db")
         except Exception as e:
             log(f"  Error: {e}")
 
     # Decrypt MSG0.db
     msg_src = os.path.join(wx_dir, "Msg", "Multi", "MSG0.db")
+    msg_dst = os.path.join(DECRYPT_DIR, "Multi", "de_MSG0.db")
     if os.path.exists(msg_src):
         log(f"Decrypting: MSG0.db")
         try:
-            decrypt_merge(key, msg_src, os.path.join(DECRYPT_DIR, "Multi"))
+            from pywxdump import decrypt
+            decrypt(key, msg_src, msg_dst)
             log(f"  Success: de_MSG0.db")
         except Exception as e:
             log(f"  Error: {e}")
